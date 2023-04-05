@@ -1,0 +1,499 @@
+{
+	"info": {
+		"_postman_id": "7c0075a6-dbd8-4165-96a5-9c04095bba04",
+		"name": "Trello",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Board",
+			"item": [
+				{
+					"name": "Get boards",
+					"_postman_id": "a05a8acd-f894-4a48-b1ae-00ea5fcbbb4b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/1/members/me/boards?fields=name,url&key={{key}}&token={{token}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"1",
+								"members",
+								"me",
+								"boards"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name,url"
+								},
+								{
+									"key": "key",
+									"value": "{{key}}"
+								},
+								{
+									"key": "token",
+									"value": "{{token}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create board",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "435b98ed-f3ae-48bf-a6e2-36a51fd2fa0f",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Board created correctly\", function () {",
+									"    pm.expect(response.name).to.eql(pm.environment.get(\"board_name\"));",
+									"    pm.expect(response.closed).to.eql(false);",
+									"});",
+									"",
+									"pm.test(\"Board is private\", function() {",
+									"    pm.expect(response.prefs.permissionLevel).to.eql(\"private\");",
+									"});",
+									"",
+									"pm.environment.set(\"board_id\", response.id);",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8fb7cdb0-4265-4321-a6b5-bc816dda1378",
+								"exec": [
+									"board_name = \"Test board \" + parseInt(Math.random() * 100)",
+									"pm.environment.set(\"board_name\", board_name);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"_postman_id": "023f896e-9897-44f3-b1ce-8605dc756cae",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/1/boards?name={{board_name}}&key={{key}}&token={{token}}&defaultLists=false",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"1",
+								"boards"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "{{board_name}}"
+								},
+								{
+									"key": "key",
+									"value": "{{key}}"
+								},
+								{
+									"key": "token",
+									"value": "{{token}}"
+								},
+								{
+									"key": "defaultLists",
+									"value": "false",
+									"type": "text"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete board",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "92995fb5-7ced-41bc-bbc7-98f529fea554",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"_postman_id": "506a93d3-8fe1-4b17-bd0c-e5d0ca26e852",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/1/boards/:id?key={{key}}&token={{token}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"1",
+								"boards",
+								":id"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}"
+								},
+								{
+									"key": "token",
+									"value": "{{token}}"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "62e2904698f46c00f661c5e1",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"_postman_id": "f1355300-d27a-4467-868e-914d1ac1d955"
+		},
+		{
+			"name": "List",
+			"item": [
+				{
+					"name": "Create list",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6f9fab0d-ce74-41fe-a7a9-9371fd2d956a",
+								"exec": [
+									"list_name = 'DONE'",
+									"pm.environment.set(\"list_name\", list_name);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "51666e11-41c6-45e1-8633-b7f5b4c387df",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const response = pm.response.json();",
+									"pm.test(\"List created correctly\", function () {",
+									"    pm.expect(response.name).to.eql(pm.environment.get(\"list_name\"));",
+									"    pm.expect(response.closed).to.eql(false);",
+									"});",
+									"pm.test(\"List created in desired board\", function () {",
+									"    pm.expect(response.idBoard).to.eql(pm.environment.get(\"board_id\"));",
+									"});",
+									"pm.environment.set(\"list_id\", response.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"_postman_id": "f95f1747-8474-4eae-9ed3-1fece93c186b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/1/lists?name={{list_name}}&idBoard={{board_id}}&key={{key}}&token={{token}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"1",
+								"lists"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "{{list_name}}"
+								},
+								{
+									"key": "idBoard",
+									"value": "{{board_id}}"
+								},
+								{
+									"key": "key",
+									"value": "{{key}}"
+								},
+								{
+									"key": "token",
+									"value": "{{token}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get list",
+					"_postman_id": "9997db69-9bef-4258-8db9-ca5b70a29eb5",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/1/lists?key={{key}}&token={{token}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"1",
+								"lists"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"type": "text"
+								},
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "text"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"_postman_id": "cd03629c-59fc-4fd1-ba84-d114c4d31d50"
+		},
+		{
+			"name": "Card",
+			"item": [
+				{
+					"name": "Create card",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "30e2e702-5680-4c27-af8b-f3309cf5c29a",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"response = pm.response.json();",
+									"",
+									"pm.test(\"Card created correctly\", function () {",
+									"    pm.expect(response.name).to.eql(pm.environment.get(\"card_name\"));",
+									"    pm.expect(response.closed).to.eql(false);",
+									"});",
+									" pm.test(\"Card created in desired board\", function () {",
+									"     pm.expect(response.idBoard).to.eql(pm.environment.get(\"board_id\"));",
+									"});",
+									"pm.test(\"Card created in desired list\", function () {",
+									"    pm.expect(response.idList).to.eql(pm.environment.get(\"list_id\"));",
+									"});",
+									"pm.test(\"Card doesn't have votes and attachments\", function () {",
+									"    pm.expect(response.badges.votes).to.eql(0);",
+									"    pm.expect(response.badges.attachments).to.eql(0);",
+									"});",
+									"",
+									"pm.environment.set(\"card_id\", response.id);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8ca4004c-918e-4cf9-bb06-4644a8daaf56",
+								"exec": [
+									"card_name = \"My card \" + parseInt(Math.random() * 100)",
+									"pm.environment.set(\"card_name\", card_name);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"_postman_id": "fc7a57b9-9dff-4a4e-b9ab-c2f7002cde3d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/1/cards?name={{card_name}}&idList={{list_id}}&key={{key}}&token={{token}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"1",
+								"cards"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "{{card_name}}"
+								},
+								{
+									"key": "idList",
+									"value": "{{list_id}}"
+								},
+								{
+									"key": "key",
+									"value": "{{key}}"
+								},
+								{
+									"key": "token",
+									"value": "{{token}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update card",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "52a1be74-80ed-4adc-84bf-db1045ce7c0d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"response = pm.response.json();",
+									"",
+									"pm.test(\"Card updated correctly\", function () {",
+									"    pm.expect(response.name).to.eql(pm.environment.get(\"card_name\"));",
+									"    pm.expect(response.closed).to.eql(false);",
+									"});",
+									" pm.test(\"Card is moved to DONE list\", function () {",
+									"    pm.expect(response.idList).to.eql(pm.environment.get(\"list_id\"));",
+									" });",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6562e121-417d-4a2d-8d57-0e83c35548f3",
+								"exec": [
+									"card_name = 'New card name ' + parseInt(Math.random() * 100)",
+									"pm.environment.set(\"card_name\", card_name);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"_postman_id": "16db41e2-dbc4-4e0f-bb37-4884b743d2b7",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/1/cards/:id?idList={{list_id}}&key={{key}}&token={{token}}&name={{card_name}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"1",
+								"cards",
+								":id"
+							],
+							"query": [
+								{
+									"key": "idList",
+									"value": "{{list_id}}"
+								},
+								{
+									"key": "key",
+									"value": "{{key}}"
+								},
+								{
+									"key": "token",
+									"value": "{{token}}"
+								},
+								{
+									"key": "name",
+									"value": "{{card_name}}"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{card_id}}",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"_postman_id": "c00b1f72-a289-442a-ba1b-976dd66c2546"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "cb4b0c9b-5910-44df-8dc1-d46f93a7ace4",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "a9b756a6-40a2-4152-81ae-8030eff45be9",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
